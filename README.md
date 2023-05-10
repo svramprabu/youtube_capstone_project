@@ -15,5 +15,10 @@ Migrated this dictionary data to MongoDB.
 
 Using find function in MongoDB filtered to find the channel name that is to be used in the dropdown box list of all the channels given as input so far.
 
+created a dataframe of channel details, playlist details, video details and comment details for the chosen channel in the dropdown. 
+
+later these dataframes are loaded into sql table after some transformation. 
+
+Finally some queries are inserted in the dropdown to answer the questions raised. 
 
 
