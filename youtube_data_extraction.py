@@ -1,4 +1,4 @@
-import os
+#import os
 import pymongo
 import streamlit as st
 from google.auth.transport.requests import Request
@@ -23,7 +23,7 @@ scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 def youtube_authenticate():
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
     api_service_name = "youtube"
     api_version = "v3"
