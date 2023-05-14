@@ -1,4 +1,6 @@
 os-sys
+libgtk-3-dev
+libwebkit2gtk-4.0-dev
 webview
 streamlit
 pandas
