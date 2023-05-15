@@ -193,16 +193,16 @@ if __name__ == "__main__":
                                                  password='sVEZET2z8l')
             if mydb.is_connected():
                 db_Info = mydb.get_server_info()
-                print("Connected to MySQL Server version ", db_Info)
+                st.write("Connected to MySQL Server version ", db_Info)
                 cursor = mydb.cursor()
                 cursor.execute("CREATE DATABASE if not exists yt_details")
                 #cursor.execute("select database();")
                 cursor.execute("use yt_details")
                 record = cursor.fetchone()
-                print("You're connected to database: ", record)
+                st.write("You're connected to database: ", record)
 
         except Error as e:
-            print("Error while connecting to MySQL", e)
+            st.write("Error while connecting to MySQL", e)
         
         
         
