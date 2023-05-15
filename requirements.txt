@@ -2,7 +2,7 @@
 #mysql
 #mysql-connector-python
 streamlit
-#pandas
+pandas
 pymongo
 
 #sqlalchemy
