@@ -22,7 +22,7 @@ if __name__ == "__main__":
             record = cursor.fetchone()
             st.write("You're connected to database: ", record)
             if st.button(" Q1 What are the names of all the videos and their corresponding channels?"):
-                Q1="SELECT video_det.video_title, playlist_det.Channel_title FROM video_det INNER JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id"
+                Q1="SELECT video_det.video_title, playlist_det.Channel_title FROM video_det FULL OUTER JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id"
                 ans1 = pd.read_sql(Q1,mydb)
                 st.write(f"Query: {Q1}")
                 st.write(ans1)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
             # 
             if st.button("Q5 Which videos have the highest number of likes, and what are their corresponding channel names?"):
-                Q5 ="SELECT video_det.video_title, video_det.likeCount,channel_det.Channel_Name FROM video_det INNER JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id INNER JOIN channel_det ON channel_det.Channel_Id=playlist_det.Channel_id ORDER BY video_det.likeCount DESC"
+                Q5 ="SELECT video_det.video_title, video_det.likeCount,channel_det.Channel_Name FROM video_det LEFT JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id LEFT JOIN channel_det ON channel_det.Channel_Id=playlist_det.Channel_id ORDER BY video_det.likeCount DESC"
                 ans5 = pd.read_sql(Q5,mydb)
                 st.write(f"Query: {Q5}")
                 st.write(ans5)
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
             # 
             if st.button("Q10 Which videos have the highest number of comments, and what are their corresponding channel names?"):
-                Q10="SELECT count(comment_det.comment_id) AS no_of_comments,video_det.video_title AS no_of_cmnts,video_det.channelTitle FROM video_det INNER JOIN comment_det ON comment_det.video_id=video_det.video_id GROUP BY video_det.video_title,video_det.channelTitle"
+                Q10="SELECT count(comment_det.comment_id) AS no_of_comments,video_det.video_title AS no_of_cmnts,video_det.channelTitle FROM video_det LEFT JOIN comment_det ON comment_det.video_id=video_det.video_id GROUP BY video_det.video_title,video_det.channelTitle"
                 ans10 = pd.read_sql(Q10,mydb)
                 st.write(f"Query: {Q10}")
                 st.write(ans10)
