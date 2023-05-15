@@ -3,7 +3,7 @@ import pandas as pd
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-import mysql.connector
+#import mysql.connector
 
 
 
@@ -182,14 +182,30 @@ if __name__ == "__main__":
          st.write("choose from options above")
 
     if st.button("to SQL db"):
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="12345",
-            database="yt_details"
-                )
-        #mydb
-        cursor = mydb.cursor()
+        
+        import mysql.connector
+        from mysql.connector import Error
+
+        try:
+            mydb = mysql.connector.connect(host='sql12.freemysqlhosting.net',
+                                                 #database='Electronics',
+                                                 user='sql12618369',
+                                                 password='sVEZET2z8l')
+            if mydb.is_connected():
+                db_Info = mydb.get_server_info()
+                print("Connected to MySQL Server version ", db_Info)
+                cursor = mydb.cursor()
+                cursor.execute("select database();")
+                record = cursor.fetchone()
+                print("You're connected to database: ", record)
+
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        
+        break
+        
+        
+        
         cursor.execute("drop table if exists comment_det")
         cursor.execute("drop table if exists video_det")
         cursor.execute("drop table if exists playlist_det")
