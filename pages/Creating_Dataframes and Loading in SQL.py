@@ -196,9 +196,9 @@ if __name__ == "__main__":
                 db_Info = mydb.get_server_info()
                 st.write("Connected to MySQL Server version ", db_Info)
                 cursor = mydb.cursor()
-                cursor.execute("CREATE DATABASE if not exists yt_details")
-                #cursor.execute("select database();")
-                cursor.execute("use yt_details")
+                #cursor.execute("CREATE DATABASE if not exists yt_details")
+                cursor.execute("select database();")
+                #cursor.execute("use yt_details")
                 record = cursor.fetchone()
                 st.write("You're connected to database: ", record)
 
