@@ -1,4 +1,4 @@
-#import os
+import os
 import pymongo
 import streamlit as st
 from google.auth.transport.requests import Request
@@ -23,7 +23,7 @@ scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 def youtube_authenticate():
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
-    #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
     api_service_name = "youtube"
     api_version = "v3"
@@ -134,7 +134,7 @@ def playlistitem_details_to_mongo_db(pl_item_of_each_pl_id):
 def video_details_to_mongo_db(vid_list):
     for each_item in vid_list:
         #st.write(i['id'])
-        
+        #st.write(each_item)
         vid_details = {'video_details':{
                     'Video_id' :each_item['id'],
                     'video_publishedAt':each_item['snippet']['publishedAt'],
@@ -148,15 +148,20 @@ def video_details_to_mongo_db(vid_list):
                     'viewCount':each_item['statistics']['viewCount'],
                     'likeCount':each_item['statistics']['likeCount'],
                     'favoriteCount':each_item['statistics']['favoriteCount'],
-                    'commentCount':each_item['statistics']['commentCount']
+                    
+                    'commentCount':   -1 if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
+                                        
+                    
                  }
 
                   }
+        # break
         video_db.insert_one(vid_details)
 
-def comment_details_to_mongo_db(comments):
-    for i in comments:
+def comment_details_to_mongo_db(comments_list):
+    for i in comments_list:
         #st.write(i['snippet']['topLevelComment']['id'])
+        #st.write(i)
         comment_det = {'Comment_details':{
             'comment_id':i['snippet']['topLevelComment']['id'],
             'video_id':i['snippet']['topLevelComment']['snippet']['videoId'],
@@ -235,9 +240,12 @@ if __name__ == "__main__":
                     video_details_to_mongo_db(video_details[v_id['contentDetails']['videoId']]['items'])
                     try:      
                         comment_details[v_id['contentDetails']['videoId']] = get_comment_details(youtube, v_id['contentDetails']['videoId'])
+                        comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
+
                     except:
                         comment_details[v_id['contentDetails']['videoId']] = 'none'
-                    comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
+                    # st.write(comment_details[v_id['contentDetails']['videoId']])#['items'])
+                    # break
         st.write("Completed successfully.")
         st.write("please navigate to next page" )
     else:
