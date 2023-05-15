@@ -22,7 +22,7 @@ if __name__ == "__main__":
             record = cursor.fetchone()
             st.write("You're connected to database: ", record)
             if st.button(" Q1 What are the names of all the videos and their corresponding channels?"):
-                Q1="SELECT video_det.video_title, playlist_det.Channel_title FROM video_det FULL OUTER JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id"
+                Q1="SELECT video_det.video_title, playlist_det.Channel_title FROM video_det FULL JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id"
                 ans1 = pd.read_sql(Q1,mydb)
                 st.write(f"Query: {Q1}")
                 st.write(ans1)
