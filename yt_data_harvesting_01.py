@@ -1,7 +1,7 @@
 
 
 import streamlit as st
-import pymongo
+# import pymongo
 
 import googleapiclient.discovery
 from pymongo.mongo_client import MongoClient
@@ -211,7 +211,7 @@ if __name__ == "__main__":
             playlist_details_to_mongo_db(playlist[each_id])
             for each_pl_id in playlist_ids[each_id]:
                 playlistitems[each_pl_id]= get_playlistitems_details(youtube, each_pl_id)
-                playlistitem_details_to_mongo_db(playlistitems[each_pl_id])
+                playlistitem_details_to_mongo_db(playlistitems[each_pl_id]) 
                 for v_id in playlistitems[each_pl_id]['items']:
                     video_details[v_id['contentDetails']['videoId']] = get_video_details(youtube, id = v_id['contentDetails']['videoId'])
                     # st.write(ord(video_details[v_id['contentDetails']['videoId']]['items'][0]['contentDetails']['duration']))
