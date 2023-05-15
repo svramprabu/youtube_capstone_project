@@ -34,9 +34,9 @@ if __name__ == "__main__":
     for each_channel_id in channel_db.find():
         col_channel = list(each_channel_id['Channel_Details'].keys())
         break
-    channels_df = pd.DataFrame(list(channel_db.find(),columns = col_channel)        
-    #for each_channel_id in channel_db.find():
-    #     channels_df=pd.concat([channels_df, pd.Series(each_channel_id['Channel_Details']).to_frame().T],ignore_index=True)
+    #channels_df = pd.DataFrame(list(channel_db.find(),columns = col_channel)        
+    for each_channel_id in channel_db.find():
+        channels_df=pd.concat([channels_df, pd.Series(each_channel_id['Channel_Details']).to_frame().T],ignore_index=True)
 
     #playlist df creation
 
@@ -83,10 +83,7 @@ if __name__ == "__main__":
         video_df=pd.concat([video_df,pd.Series(i['video_details']).to_frame().T],ignore_index=True)
 
     video_df['video_publishedAt']= pd.to_datetime(video_df['video_publishedAt'])
-    video_df['playlist_id']=video_df['Video_id']
-
-    for each_id in playlist_df['Video_id']:
-        video_df['playlist_id']=video_df['playlist_id'].replace(each_id,(playlist_df[video_df['playlist_id']==each_id]['playlist_id']).values[0])
+    video_df=pd.merge(video_df,pl_items_df)
     playlist_df=playlist_df.drop(['Video_id'], axis=1)
 
     for each_item in video_df['duration']:
