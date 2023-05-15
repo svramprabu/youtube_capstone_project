@@ -7,11 +7,11 @@ import pandas as pd
 
 if __name__ == "__main__":
     try:
-        mydb = mysql.connector.connect(host='sql12.freemysqlhosting.net',
-                                             database='sql12618369',
-                                             user='sql12618369',
-                                             password='sVEZET2z8l',
-                                            port=3306)
+        mydb = mysql.connector.connect(host=st.secrets["sqlhost"],
+                                                 database='sql12618369',
+                                                 user=st.secrets["sqldb_username"],
+                                                 password=st.secrets["sqldb_pwd"],
+                                                port=3306)
         if mydb.is_connected():
             db_Info = mydb.get_server_info()
             st.write("Connected to MySQL Server version ", db_Info)
