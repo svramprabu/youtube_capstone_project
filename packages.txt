@@ -1,3 +1,5 @@
 mysql-server
-libmysqlclient-dev
-libmariadbclient-dev
+libmariadb-dev-compat
+#libmysqlclient-dev
+#ibmariadbclient-dev
+libmariadb-dev
