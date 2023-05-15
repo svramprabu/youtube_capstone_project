@@ -5,7 +5,7 @@ streamlit
 pandas
 pymongo
 
-#sqlalchemy
+sqlalchemy
 
 google-api-python-client
 google-auth-httplib2
