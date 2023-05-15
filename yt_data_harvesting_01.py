@@ -78,7 +78,7 @@ def channel_details_to_mongo_db(data):
             "Number_of_Videos": data['items'][0]['statistics']['videoCount']
         }
     }
-    #st.write(channel_details_data)
+    
     channel_db.insert_one(ch_details)
 
 def playlist_details_to_mongo_db(pl_of_each_id):
@@ -98,7 +98,6 @@ def playlist_details_to_mongo_db(pl_of_each_id):
 
 def playlistitem_details_to_mongo_db(pl_item_of_each_pl_id):
     for i in pl_item_of_each_pl_id['items']:
-        #st.write(i['snippet']['thumbnails']['default']['url'])
         pl_items_details = {
                         'playlistitem_details':{ 'channelId':i['snippet']['channelId'],
                         'channelTitle':i['snippet']['channelTitle'],
@@ -110,8 +109,6 @@ def playlistitem_details_to_mongo_db(pl_item_of_each_pl_id):
 
 def video_details_to_mongo_db(vid_list):
     for each_item in vid_list:
-        #st.write(i['id'])
-        #st.write(each_item)
         vid_details = {'video_details':{
                     'Video_id' :each_item['id'],
                     'video_publishedAt':each_item['snippet']['publishedAt'],
@@ -128,17 +125,11 @@ def video_details_to_mongo_db(vid_list):
                     
                     'commentCount':   
                         -1 if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
-                                        
-                    
                  }
-
                   }
-        # break
         video_db.insert_one(vid_details)
 def comment_details_to_mongo_db(comments_list):
     for i in comments_list:
-        #st.write(i['snippet']['topLevelComment']['id'])
-        #st.write(i)
         comment_det = {'Comment_details':{
             'comment_id':i['snippet']['topLevelComment']['id'],
             'video_id':i['snippet']['topLevelComment']['snippet']['videoId'],
@@ -158,7 +149,7 @@ if __name__ == "__main__":
     # Create a new client and connect to the server
     client = MongoClient(uri, server_api=ServerApi('1'))
 
-    # Send a ping to confirm a successful connection
+    # Sending a ping to confirm a successful connection
     try:
         client.admin.command('ping')
         st.write("Pinged your deployment. You are successfully connected to MongoDB!")
@@ -208,8 +199,6 @@ if __name__ == "__main__":
                 playlistitem_details_to_mongo_db(playlistitems[each_pl_id]) 
                 for v_id in playlistitems[each_pl_id]['items']:
                     video_details[v_id['contentDetails']['videoId']] = get_video_details(youtube, id = v_id['contentDetails']['videoId'])
-                    # st.write(ord(video_details[v_id['contentDetails']['videoId']]['items'][0]['contentDetails']['duration']))
-                    # break
                     video_details_to_mongo_db(video_details[v_id['contentDetails']['videoId']]['items'])
                     try:      
                         comment_details[v_id['contentDetails']['videoId']] = get_comment_details(youtube, v_id['contentDetails']['videoId'])
@@ -217,8 +206,6 @@ if __name__ == "__main__":
 
                     except:
                         comment_details[v_id['contentDetails']['videoId']] = 'none'
-                    # st.write(comment_details[v_id['contentDetails']['videoId']])#['items'])
-                    # break
         st.write("Completed successfully.")
         st.write("please navigate to next page" )
     else:
