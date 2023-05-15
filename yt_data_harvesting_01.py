@@ -21,16 +21,10 @@ scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
 @st.cache_data
 def youtube_authenticate():
-    # Disable OAuthlib's HTTPS verification when running locally.
-    # *DO NOT* leave this option enabled in production.
-    #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
     api_service_name = "youtube"
     api_version = "v3"
-    #client_secrets_file = r"C:\Users\SVR\Python vs code\Guvi_Projects\credentials.json"
-    dev_key = "AIzaSyAJSNdqINYUD9nzb39D4MUPYrWw-s6rb9c"
     return googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = dev_key)
+        api_service_name, api_version, developerKey = st.secrets["devkey"])
 
 @st.cache_data
 def get_channel_details(_youtube, **kwargs):
@@ -44,7 +38,7 @@ def get_playlist_details(_youtube, **kwargs):
     return youtube.playlists().list(
         part="snippet,contentDetails",
         **kwargs,
-        maxResults=3
+        maxResults=10
         ).execute()
 
 @st.cache_data
@@ -52,7 +46,7 @@ def get_playlistitems_details(_youtube, pl_id):
 
     return youtube.playlistItems().list(
         part="snippet,contentDetails",
-        maxResults=3,
+        maxResults=10,
         playlistId=pl_id
         ).execute() 
 
@@ -60,7 +54,7 @@ def get_playlistitems_details(_youtube, pl_id):
 def get_video_details(_youtube, **kwargs):
     return youtube.videos().list(
         part="snippet,contentDetails,statistics",
-        maxResults=3,
+        maxResults=10,
         **kwargs
         ).execute()
 
@@ -68,7 +62,7 @@ def get_video_details(_youtube, **kwargs):
 def get_comment_details(_youtube, video_id):
     return youtube.commentThreads().list(
         part="snippet,replies",
-        maxResults=3,
+        maxResults=10,
         videoId=video_id
         ).execute()    
 
@@ -158,7 +152,7 @@ def comment_details_to_mongo_db(comments_list):
   
 if __name__ == "__main__":
     youtube = youtube_authenticate()
-    #st.write(youtube)
+    
     uri = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
     # Create a new client and connect to the server
@@ -167,7 +161,7 @@ if __name__ == "__main__":
     # Send a ping to confirm a successful connection
     try:
         client.admin.command('ping')
-        st.write("Pinged your deployment. You successfully connected to MongoDB!")
+        st.write("Pinged your deployment. You are successfully connected to MongoDB!")
     except Exception as e:
         st.write(e)
 
@@ -198,7 +192,7 @@ if __name__ == "__main__":
     
     for i in range(number):
         user_input_channel_ids.append(st.text_input("enter",key=i))
-    if st.button("get details"):
+    if st.button("get details using API"):
             
         st.write("Processing...")
         for each_id in user_input_channel_ids:
