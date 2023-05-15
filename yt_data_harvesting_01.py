@@ -117,7 +117,6 @@ def video_details_to_mongo_db(vid_list):
                     'description':each_item['snippet']['description'],
                     'thumbnail_url':each_item['snippet']['thumbnails']['default']['url'],
                     'channelTitle':each_item['snippet']['channelTitle'],
-                    # 'tags':i['snippet']['tags'],
                     'duration':each_item['contentDetails']['duration'],
                     'viewCount':each_item['statistics']['viewCount'],
                     'likeCount':each_item['statistics']['likeCount'],
@@ -203,7 +202,6 @@ if __name__ == "__main__":
                     try:      
                         comment_details[v_id['contentDetails']['videoId']] = get_comment_details(youtube, v_id['contentDetails']['videoId'])
                         comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
-
                     except:
                         comment_details[v_id['contentDetails']['videoId']] = 'none'
         st.write("Completed successfully.")
