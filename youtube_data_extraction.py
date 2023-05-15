@@ -28,7 +28,6 @@ def youtube_authenticate():
     api_service_name = "youtube"
     api_version = "v3"
     #client_secrets_file = r"C:\Users\SVR\Python vs code\Guvi_Projects\credentials.json"
-    dev_key = "AIzaSyAJSNdqINYUD9nzb39D4MUPYrWw-s6rb9c"
     return googleapiclient.discovery.build(api_service_name, api_version, developerKey = st.secrets["devkey"])
 
 @st.cache_data
