@@ -161,7 +161,7 @@ if __name__ == "__main__":
     
     
 
-    uri = "mongodb+srv://svrdb:st.secrets["mongodb_pwd"]@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+    uri = f"mongodb+srv://svrdb:{st.secrets["mongodb_pwd"]}@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
     # Create a new client and connect to the server
     client = MongoClient(uri, server_api=ServerApi('1'))
