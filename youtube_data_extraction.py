@@ -29,8 +29,7 @@ def youtube_authenticate():
     api_version = "v3"
     #client_secrets_file = r"C:\Users\SVR\Python vs code\Guvi_Projects\credentials.json"
     dev_key = "AIzaSyAJSNdqINYUD9nzb39D4MUPYrWw-s6rb9c"
-    return googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = dev_key)
+    return googleapiclient.discovery.build(api_service_name, api_version, developerKey = dev_key)
 
 @st.cache_data
 def get_channel_details(_youtube, **kwargs):
