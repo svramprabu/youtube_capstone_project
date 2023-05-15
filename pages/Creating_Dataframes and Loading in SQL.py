@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
         try:
             mydb = mysql.connector.connect(host='sql12.freemysqlhosting.net',
-                                                 #database='Electronics',
+                                                 database='sql12618369',
                                                  user='sql12618369',
                                                  password='sVEZET2z8l',
                                                 port=3306)
