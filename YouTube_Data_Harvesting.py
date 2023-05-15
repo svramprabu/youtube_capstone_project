@@ -1,19 +1,7 @@
-
-
 import streamlit as st
-# import pymongo
-
 import googleapiclient.discovery
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-
-
-
-
-
-
-
-
 
 st.title('Youtube Data Scraping app:chart_with_upwards_trend:')
 
@@ -78,14 +66,12 @@ def channel_details_to_mongo_db(data):
             "Number_of_Videos": data['items'][0]['statistics']['videoCount']
         }
     }
-    
     channel_db.insert_one(ch_details)
 
 def playlist_details_to_mongo_db(pl_of_each_id):
     
     for i in pl_of_each_id['items']:
-    
-        pl_details = {
+            pl_details = {
                 'playlist_details':{
                     'playlist_id' :i['id'],
                     'channelId' :i['snippet']['channelId'],
@@ -121,7 +107,6 @@ def video_details_to_mongo_db(vid_list):
                     'viewCount':each_item['statistics']['viewCount'],
                     'likeCount':each_item['statistics']['likeCount'],
                     'favoriteCount':each_item['statistics']['favoriteCount'],
-                    
                     'commentCount':   
                         '-1' if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
                  }
@@ -137,16 +122,15 @@ def comment_details_to_mongo_db(comments_list):
             'publishedAt': i['snippet']['topLevelComment']['snippet']['publishedAt']
                                             }
                         }
-        
         comment_db.insert_one(comment_det)
   
 if __name__ == "__main__":
     youtube = youtube_authenticate()
     
-    uri = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+    url = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
     # Create a new client and connect to the server
-    client = MongoClient(uri, server_api=ServerApi('1'))
+    client = MongoClient(url, server_api=ServerApi('1'))
 
     # Sending a ping to confirm a successful connection
     try:
