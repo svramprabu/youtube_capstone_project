@@ -8,7 +8,7 @@ from pymongo.server_api import ServerApi
 
 
 if __name__ == "__main__":
-    uri = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+    uri = "mongodb+srv://svrdb:st.secrets["mongodb_pwd"]@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
     # Create a new client and connect to the server
     client = MongoClient(uri, server_api=ServerApi('1'))
@@ -187,10 +187,10 @@ if __name__ == "__main__":
         from mysql.connector import Error
 
         try:
-            mydb = mysql.connector.connect(host='sql12.freemysqlhosting.net',
+            mydb = mysql.connector.connect(host=st.secrets["sqlhost"],
                                                  database='sql12618369',
-                                                 user='sql12618369',
-                                                 password='sVEZET2z8l',
+                                                 user=st.secrets["sqldb_username"],
+                                                 password=st.secrets["sqldb_pwd"],
                                                 port=3306)
             if mydb.is_connected():
                 db_Info = mydb.get_server_info()
