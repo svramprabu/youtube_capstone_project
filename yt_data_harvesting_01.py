@@ -124,7 +124,7 @@ def video_details_to_mongo_db(vid_list):
                     'favoriteCount':each_item['statistics']['favoriteCount'],
                     
                     'commentCount':   
-                        -1 if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
+                        '-1' if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
                  }
                   }
         video_db.insert_one(vid_details)

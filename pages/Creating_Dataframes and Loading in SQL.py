@@ -3,9 +3,6 @@ import pandas as pd
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-#import mysql.connector
-
-
 
 if __name__ == "__main__":
     pwd = st.secrets["mongodb_pwd"]
