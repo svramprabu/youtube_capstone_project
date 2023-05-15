@@ -31,6 +31,130 @@ def youtube_authenticate():
     dev_key = "AIzaSyAJSNdqINYUD9nzb39D4MUPYrWw-s6rb9c"
     return googleapiclient.discovery.build(
         api_service_name, api_version, developerKey = dev_key)
+
+@st.cache_data
+def get_channel_details(_youtube, **kwargs):
+    return youtube.channels().list(
+        part="statistics,snippet,contentDetails",
+        **kwargs
+    ).execute()
+
+@st.cache_data
+def get_playlist_details(_youtube, **kwargs):
+    return youtube.playlists().list(
+        part="snippet,contentDetails",
+        **kwargs,
+        maxResults=3
+        ).execute()
+
+@st.cache_data
+def get_playlistitems_details(_youtube, pl_id):
+
+    return youtube.playlistItems().list(
+        part="snippet,contentDetails",
+        maxResults=3,
+        playlistId=pl_id
+        ).execute() 
+
+@st.cache_data
+def get_video_details(_youtube, **kwargs):
+    return youtube.videos().list(
+        part="snippet,contentDetails,statistics",
+        maxResults=3,
+        **kwargs
+        ).execute()
+
+@st.cache_data
+def get_comment_details(_youtube, video_id):
+    return youtube.commentThreads().list(
+        part="snippet,replies",
+        maxResults=3,
+        videoId=video_id
+        ).execute()    
+
+def channel_details_to_mongo_db(data):
+    
+    ch_details = {
+        "Channel_Details": {
+            "Channel_Name": data['items'][0]['snippet']['title'],
+            "Channel_Id": data['items'][0]['id'],
+            "Subscription_Count": data['items'][0]['statistics']['subscriberCount'],
+            "Channel_Views": data['items'][0]['statistics']['viewCount'],
+            "Channel_Description": data['items'][0]['snippet']['description'],
+            "Number_of_Videos": data['items'][0]['statistics']['videoCount']
+        }
+    }
+    #st.write(channel_details_data)
+    channel_db.insert_one(ch_details)
+
+def playlist_details_to_mongo_db(pl_of_each_id):
+    
+    for i in pl_of_each_id['items']:
+    
+        pl_details = {
+                'playlist_details':{
+                    'playlist_id' :i['id'],
+                    'channelId' :i['snippet']['channelId'],
+                    'playlist_title' :i['snippet']['title'],
+                    'playlist_description' :i['snippet']['description'],
+                    'Playlist_video_count' :i['contentDetails']['itemCount']
+                                    }
+                                }
+        playlist_db.insert_one(pl_details)
+
+def playlistitem_details_to_mongo_db(pl_item_of_each_pl_id):
+    for i in pl_item_of_each_pl_id['items']:
+        #st.write(i['snippet']['thumbnails']['default']['url'])
+        pl_items_details = {
+                        'playlistitem_details':{ 'channelId':i['snippet']['channelId'],
+                        'channelTitle':i['snippet']['channelTitle'],
+                        'playlist_id':i['snippet']['playlistId'],
+                        'Video_id':i['contentDetails']['videoId']
+                                                }
+                            }
+        playlistitems_db.insert_one(pl_items_details)
+
+def video_details_to_mongo_db(vid_list):
+    for each_item in vid_list:
+        #st.write(i['id'])
+        #st.write(each_item)
+        vid_details = {'video_details':{
+                    'Video_id' :each_item['id'],
+                    'video_publishedAt':each_item['snippet']['publishedAt'],
+                    'channelId':each_item['snippet']['channelId'],
+                    'video_title':each_item['snippet']['title'],
+                    'description':each_item['snippet']['description'],
+                    'thumbnail_url':each_item['snippet']['thumbnails']['default']['url'],
+                    'channelTitle':each_item['snippet']['channelTitle'],
+                    # 'tags':i['snippet']['tags'],
+                    'duration':each_item['contentDetails']['duration'],
+                    'viewCount':each_item['statistics']['viewCount'],
+                    'likeCount':each_item['statistics']['likeCount'],
+                    'favoriteCount':each_item['statistics']['favoriteCount'],
+                    
+                    'commentCount':   
+                        -1 if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
+                                        
+                    
+                 }
+
+                  }
+        # break
+        video_db.insert_one(vid_details)
+def comment_details_to_mongo_db(comments_list):
+    for i in comments_list:
+        #st.write(i['snippet']['topLevelComment']['id'])
+        #st.write(i)
+        comment_det = {'Comment_details':{
+            'comment_id':i['snippet']['topLevelComment']['id'],
+            'video_id':i['snippet']['topLevelComment']['snippet']['videoId'],
+            'textDisplay':i['snippet']['topLevelComment']['snippet']['textDisplay'],
+            'authorDisplayName':i['snippet']['topLevelComment']['snippet']['authorDisplayName'],
+            'publishedAt': i['snippet']['topLevelComment']['snippet']['publishedAt']
+                                            }
+                        }
+        
+        comment_db.insert_one(comment_det)
   
 if __name__ == "__main__":
     youtube = youtube_authenticate()
