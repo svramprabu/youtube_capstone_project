@@ -194,4 +194,38 @@ if __name__ == "__main__":
     comment_details={}
     
 
-    number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)        
+    number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)      
+    
+    for i in range(number):
+        user_input_channel_ids.append(st.text_input("enter",key=i))
+    if st.button("get details"):
+            
+        st.write("Processing...")
+        for each_id in user_input_channel_ids:
+            channels[each_id] = get_channel_details(youtube,id=each_id)
+            playlist[each_id] = get_playlist_details(youtube, channelId = each_id)
+            channel_details_to_mongo_db(channels[each_id])
+            playlist_ids.setdefault(each_id,[])
+            for each_pl in playlist[each_id]['items']:
+                playlist_ids[each_id].append(each_pl['id'])
+            playlist_details_to_mongo_db(playlist[each_id])
+            for each_pl_id in playlist_ids[each_id]:
+                playlistitems[each_pl_id]= get_playlistitems_details(youtube, each_pl_id)
+                playlistitem_details_to_mongo_db(playlistitems[each_pl_id])
+                for v_id in playlistitems[each_pl_id]['items']:
+                    video_details[v_id['contentDetails']['videoId']] = get_video_details(youtube, id = v_id['contentDetails']['videoId'])
+                    # st.write(ord(video_details[v_id['contentDetails']['videoId']]['items'][0]['contentDetails']['duration']))
+                    # break
+                    video_details_to_mongo_db(video_details[v_id['contentDetails']['videoId']]['items'])
+                    try:      
+                        comment_details[v_id['contentDetails']['videoId']] = get_comment_details(youtube, v_id['contentDetails']['videoId'])
+                        comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
+
+                    except:
+                        comment_details[v_id['contentDetails']['videoId']] = 'none'
+                    # st.write(comment_details[v_id['contentDetails']['videoId']])#['items'])
+                    # break
+        st.write("Completed successfully.")
+        st.write("please navigate to next page" )
+    else:
+        st.write("click get details to proceed")     
