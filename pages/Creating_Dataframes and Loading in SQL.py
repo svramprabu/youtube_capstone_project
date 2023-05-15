@@ -190,7 +190,8 @@ if __name__ == "__main__":
             mydb = mysql.connector.connect(host='sql12.freemysqlhosting.net',
                                                  #database='Electronics',
                                                  user='sql12618369',
-                                                 password='sVEZET2z8l')
+                                                 password='sVEZET2z8l',
+                                                port=3306)
             if mydb.is_connected():
                 db_Info = mydb.get_server_info()
                 st.write("Connected to MySQL Server version ", db_Info)
