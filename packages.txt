@@ -1,3 +1,3 @@
-mysql-server
-libmariadb-dev-compat
-libmariadb-dev
+mysql-server python-dev
+libmariadb-dev-compat python-dev
+libmariadb-dev python-dev
