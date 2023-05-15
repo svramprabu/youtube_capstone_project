@@ -46,3 +46,28 @@ if __name__ == "__main__":
         st.write("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         st.write(e)
+
+    yt_dbs = client['yt_dbs']
+
+    channel_db = yt_dbs['channels']
+    playlist_db = yt_dbs['playlists']
+    playlistitems_db = yt_dbs['playlistitems']
+    video_db = yt_dbs['videodetails']
+    comment_db = yt_dbs['comments']
+
+    channel_db.delete_many({})
+    playlist_db.delete_many({})
+    playlistitems_db.delete_many({})
+    video_db.delete_many({})
+    comment_db.delete_many({})
+
+    user_input_channel_ids=[]
+    channels = {}
+    playlist={}
+    playlist_ids={}
+    playlistitems={}
+    video_details={}
+    comment_details={}
+    
+
+    number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)        
