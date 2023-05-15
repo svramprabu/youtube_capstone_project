@@ -71,7 +71,7 @@ def channel_details_to_mongo_db(data):
 def playlist_details_to_mongo_db(pl_of_each_id):
     
     for i in pl_of_each_id['items']:
-            pl_details = {
+        pl_details = {
                 'playlist_details':{
                     'playlist_id' :i['id'],
                     'channelId' :i['snippet']['channelId'],
