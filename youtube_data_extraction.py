@@ -23,31 +23,14 @@ scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 def youtube_authenticate():
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
     api_service_name = "youtube"
     api_version = "v3"
     #client_secrets_file = r"C:\Users\SVR\Python vs code\Guvi_Projects\credentials.json"
     dev_key = "AIzaSyAJSNdqINYUD9nzb39D4MUPYrWw-s6rb9c"
-
-    # credentials = None
-    # if os.path.exists("token.pickle"):
-    #     with open("token.pickle", "rb") as token:
-    #         credentials = pickle.load(token)
-    # if not credentials or not credentials.valid:
-    #     if credentials and credentials.expired and credentials.refresh_token:
-    #         credentials.refresh(Request())
-    #     else:
-
-    # # Get credentials and create an API client
-    #         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
-    #             client_secrets_file, scopes)
-    #         credentials = flow.run_local_server(port=0)
-    #     with open("token.pickle", "wb") as token:
-    #         pickle.dump(credentials, token)
-
     return googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = dev_key)#credentials=credentials)
+        api_service_name, api_version, developerKey = dev_key)
 
 @st.cache_data
 def get_channel_details(_youtube, **kwargs):
