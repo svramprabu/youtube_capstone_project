@@ -32,9 +32,9 @@ if __name__ == "__main__":
     #channel df creation
 
     for each_channel_id in channel_db.find():
-        channels_df = pd.DataFrame(columns = list(each_channel_id['Channel_Details'].keys()))
+        col_channel = list(each_channel_id['Channel_Details'].keys())
         break
-    channels_df = pd.DataFrame(list(channel_db.find())        
+    channels_df = pd.DataFrame(list(channel_db.find(),columns = col_channel)        
 #     for each_channel_id in channel_db.find():
 #         channels_df=pd.concat([channels_df, pd.Series(each_channel_id['Channel_Details']).to_frame().T],ignore_index=True)
 
