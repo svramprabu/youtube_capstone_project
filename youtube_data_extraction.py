@@ -200,7 +200,7 @@ if __name__ == "__main__":
     number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)
 
     for i in range(number):
-        user_input_channel_ids.append(st.text_input("enter",key=i))
+        user_input_channel_ids.append(st.text_input("enter channel ID",key=i))
     if st.button("get details"):
             
         st.write("Processing...")
