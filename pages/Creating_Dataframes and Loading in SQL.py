@@ -127,14 +127,7 @@ if __name__ == "__main__":
             'which of these channels do you like to work on?',
             tuple(dropdown))
     
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="12345",
-            database="yt_details"
-                )
-        #mydb
-        cursor = mydb.cursor()
+
         #st.write(options)
         for option in options:
                 
@@ -189,6 +182,14 @@ if __name__ == "__main__":
          st.write("choose from options above")
 
     if st.button("to SQL db"):
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="12345",
+            database="yt_details"
+                )
+        #mydb
+        cursor = mydb.cursor()
         cursor.execute("drop table if exists comment_det")
         cursor.execute("drop table if exists video_det")
         cursor.execute("drop table if exists playlist_det")
