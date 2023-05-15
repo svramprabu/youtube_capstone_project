@@ -202,7 +202,7 @@ if __name__ == "__main__":
         except Error as e:
             print("Error while connecting to MySQL", e)
         
-        break
+        
         
         
         
