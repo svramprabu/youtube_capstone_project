@@ -27,7 +27,7 @@ def youtube_authenticate():
 
     api_service_name = "youtube"
     api_version = "v3"
-    #client_secrets_file = r"C:\Users\SVR\Python vs code\Guvi_Projects\credentials.json"
+   
     return googleapiclient.discovery.build(api_service_name, api_version, developerKey = st.secrets["devkey"])
 
 @st.cache_data
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     
     
 
-    uri = f"mongodb+srv://svrdb:{st.secrets["mongodb_pwd"]}@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+    uri = "mongodb+srv://svrdb:st.secrets["mongodb_pwd"]@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
     # Create a new client and connect to the server
     client = MongoClient(uri, server_api=ServerApi('1'))
