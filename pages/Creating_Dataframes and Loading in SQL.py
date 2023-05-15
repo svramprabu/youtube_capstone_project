@@ -31,7 +31,7 @@ if __name__ == "__main__":
     for each_channel_id in channel_db.find():
         col_channel = list(each_channel_id['Channel_Details'].keys())
         break
-    #channels_df = pd.DataFrame(list(channel_db.find(),columns = col_channel)        
+    channels_df = pd.DataFrame(list(channel_db.find(),columns = col_channel)        
     for each_channel_id in channel_db.find():
         channels_df=pd.concat([channels_df, pd.Series(each_channel_id['Channel_Details']).to_frame().T],ignore_index=True)
 
