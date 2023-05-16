@@ -85,6 +85,8 @@ if __name__ == "__main__":
                 ans10 = pd.read_sql(Q10,mydb)
                 st.write(f"Query: {Q10}")
                 st.write(ans10)
+            
+            st.write("Thank you this is the end of project scope")
 
     except Error as e:
         st.write("Error while connecting to MySQL", e)

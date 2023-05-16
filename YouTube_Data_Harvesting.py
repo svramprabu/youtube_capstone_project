@@ -143,31 +143,7 @@ def comment_details_to_mongo_db(comments_list):
 if __name__ == "__main__":
     youtube = youtube_authenticate()
     
-    url = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
-
-    # Create a new client and connect to the server
-    client = MongoClient(url, server_api=ServerApi('1'))
-
-    # Sending a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        st.write("Pinged your deployment. You are successfully connected to MongoDB!")
-    except Exception as e:
-        st.write(e)
-
-    yt_dbs = client['yt_dbs']
-
-    channel_db = yt_dbs['channels']
-    playlist_db = yt_dbs['playlists']
-    playlistitems_db = yt_dbs['playlistitems']
-    video_db = yt_dbs['videodetails']
-    comment_db = yt_dbs['comments']
-
-    channel_db.delete_many({})
-    playlist_db.delete_many({})
-    playlistitems_db.delete_many({})
-    video_db.delete_many({})
-    comment_db.delete_many({})
+    
 
     user_input_channel_ids=[]
     channels = {}
@@ -179,12 +155,39 @@ if __name__ == "__main__":
     
 
     number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)      
-    
+    st.write("you can find the :green[channel ID] of any youtube channel if the share button in the about section is clicked (or)") 
+    st.write("go to this link to find it :green[https://commentpicker.com/youtube-channel-id.php] ")
     for i in range(number):
         user_input_channel_ids.append(st.text_input("enter",key=i))
-    if st.button("get details using API"):
+    if st.button("PROCEED"):
             
         st.write("Processing...")
+        url = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+
+        # Create a new client and connect to the server
+        client = MongoClient(url, server_api=ServerApi('1'))
+
+        # Sending a ping to confirm a successful connection
+        try:
+            client.admin.command('ping')
+            st.write("Pinged your deployment. You are successfully connected to MongoDB!")
+        except Exception as e:
+            st.write(e)
+
+        yt_dbs = client['yt_dbs']
+
+        channel_db = yt_dbs['channels']
+        playlist_db = yt_dbs['playlists']
+        playlistitems_db = yt_dbs['playlistitems']
+        video_db = yt_dbs['videodetails']
+        comment_db = yt_dbs['comments']
+
+        channel_db.delete_many({})
+        playlist_db.delete_many({})
+        playlistitems_db.delete_many({})
+        video_db.delete_many({})
+        comment_db.delete_many({})
+
         for each_id in user_input_channel_ids:
             channels[each_id] = get_channel_details(youtube,id=each_id)
             playlist[each_id] = get_playlist_details(youtube, channelId = each_id)
@@ -204,7 +207,7 @@ if __name__ == "__main__":
                         comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
                     except:
                         comment_details[v_id['contentDetails']['videoId']] = 'none'
-        st.write("Completed successfully.")
-        st.write("please navigate to next page" )
+        st.write(":green[Completed successfully.]")
+        st.write("please navigate to next page in sidebar" )      
     else:
-        st.write("click get details to proceed")     
+        st.write(":red[click proceed to get data using API and migrate them to Mongo DB Atlas]")     

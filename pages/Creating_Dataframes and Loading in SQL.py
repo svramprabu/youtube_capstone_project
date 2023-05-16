@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -18,6 +17,7 @@ if __name__ == "__main__":
         st.write("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         st.write(e)
+    st.write("Retriving Data from Mongo DB for Transformation...")
 
     yt_dbs = client['yt_dbs']
 
@@ -59,14 +59,6 @@ if __name__ == "__main__":
 
     for i in playlistitems_db.find():
         pl_items_df=pd.concat([pl_items_df,pd.Series(i['playlistitem_details']).to_frame().T],ignore_index=True)
-        # pl_items_df=pl_items_df.set_index('playlist_id')
-        #pl_items_df=pl_items_df.replace(r'^\s*$', 'none', regex=True)
-        #pl_items_df['playlist_title']=pl_items_df['playlist_id']
-
-
-    # for pl_id in playlist_df['playlist_id']:
-    #     pl_items_df['playlist_title']=pl_items_df['playlist_title'].replace(pl_id,(playlist_df[playlist_df['playlist_id']==pl_id]['playlist_title'].values[0]))
-    
     
     playlist_df = pd.merge(pl_items_df, playlist_df, on=['playlist_id','channelId'])
     playlist_df=playlist_df.drop_duplicates(subset=['playlist_id'])
@@ -83,26 +75,18 @@ if __name__ == "__main__":
     video_df['video_publishedAt']= pd.to_datetime(video_df['video_publishedAt'])
     video_df=pd.merge(video_df,pl_items_df)
     playlist_df=playlist_df.drop(['Video_id'], axis=1)
-    # video_df['new_dur']=np.nan
     def convert_row(each_item):
         if each_item.__contains__('M')&each_item.__contains__('S'):
             minutes = int(each_item[2:].split('M')[0])
             total_seconds = int(each_item[2:].split('M')[1][:-1]) + (minutes*60)
-            # video_df['new_dur'].loc[each_item]=total_seconds
             return total_seconds
-            # video_df.loc[video_df['duration']==each_item,'duration']=str(total_seconds)
         elif each_item.__contains__('M') & (each_item.__contains__('S')==False):
             minutes = int(each_item[2:].split('M')[0])
             return minutes
-
-            # video_df.loc[video_df['duration']==each_item,'duration']=str(minutes)
         else:            
-            # total_seconds = each_item[2:-1]
             return each_item[2:-1]
-            # video_df.loc[video_df['duration']==each_item,'duration']=str(total_seconds)
     video_df['duration'] = video_df['duration'].apply(lambda row : convert_row(row))            
 
-    
     # comment details to dataframe
 
     for i in comment_db.find():
@@ -113,28 +97,16 @@ if __name__ == "__main__":
     for i in comment_db.find():
         comment_df=pd.concat([comment_df,pd.Series(i['Comment_details']).to_frame().T],ignore_index=True)
     comment_df['publishedAt']= pd.to_datetime(comment_df['publishedAt'])
-    
-        
-
-    
-
-    # st.dataframe(channels_df)
-    # st.dataframe(playlist_df)
-    # st.dataframe(video_df)
-    # st.dataframe(comment_df)
 
     dropdown=[]
 
     for each_ch_name in channels_df['Channel_Name']:                    # to find the channel names from mongo db
             dropdown.append(each_ch_name)
-            #st.write(each_ch_name)
     try:
         options = st.multiselect(                              # create a dropdown of channels searched in streamlit
             'which of these channels do you like to work on?',
             tuple(dropdown))
     
-
-        #st.write(options)
         for option in options:
                 
             try:
@@ -152,7 +124,6 @@ if __name__ == "__main__":
             #CHANNEL_ID=channels_df[channels_df['Channel_Name']==option].index[0]
 
             SQL_plalist_df = pd.concat([SQL_plalist_df ,playlist_df[playlist_df['channelId']==(channels_df[channels_df['Channel_Name']==option]['Channel_Id'].values[0])]])
-            #st.write((channels_df[channels_df['Channel_Name']==option]['Channel_Id'][0]))
             
             try:
                     c=SQL_video_df.head()
@@ -178,16 +149,19 @@ if __name__ == "__main__":
         SQL_comments_df=SQL_comments_df.drop_duplicates(subset=['comment_id'])
         SQL_comments_df.reset_index(inplace = True, drop = True)
         
+        st.header(":blue[Channel Details]")
         st.dataframe(SQL_channel_details_df)
+        st.header(":blue[Playlist Details]")
         st.dataframe(SQL_plalist_df)
+        st.header(":blue[Video Details]")
         st.dataframe(SQL_video_df)
+        st.header(":blue[Comments Details]")
         st.dataframe(SQL_comments_df)
-        #st.write(SQL_channel_details_df)
     except:
          
-         st.write("choose from options above")
+         st.write(":red[select from options above to get details of those channels from Mongo DB]")
 
-    if st.button("to SQL db"):
+    if st.button("Load to SQL database"):
         
         import mysql.connector
         from mysql.connector import Error
@@ -202,9 +176,7 @@ if __name__ == "__main__":
                 db_Info = mydb.get_server_info()
                 st.write("Connected to MySQL Server version ", db_Info)
                 cursor = mydb.cursor()
-                #cursor.execute("CREATE DATABASE if not exists yt_details")
                 cursor.execute("select database();")
-                #cursor.execute("use yt_details")
                 record = cursor.fetchone()
                 st.write("You're connected to database: ", record)
                 cursor.execute("drop table if exists comment_det")
@@ -216,8 +188,6 @@ if __name__ == "__main__":
                 cursor.execute("create table if not exists playlist_det(Channel_id VARCHAR(255), FOREIGN KEY (Channel_id) REFERENCES channel_det(Channel_Id),Channel_title TEXT,playlist_id VARCHAR(255) PRIMARY KEY, Playlist_title VARCHAR(255), Playlist_video_count INT)")
                 cursor.execute("create table if not exists video_det(video_id VARCHAR(255) PRIMARY KEY, video_publishedAt VARCHAR(255), Channel_id VARCHAR(255), video_title TEXT, Video_description TEXT,thumbnail_url VARCHAR(255), channelTitle VARCHAR(255), duration INT, viewCount INT, likeCount INT,favoriteCount INT, commentCount INT, playlist_id VARCHAR(255), FOREIGN KEY (playlist_id) REFERENCES playlist_det(playlist_id))")
                 cursor.execute("create table if not exists comment_det(comment_id VARCHAR(255) PRIMARY KEY, video_id VARCHAR(255), FOREIGN KEY (video_id) REFERENCES video_det(video_id),textDisplay TEXT, authorDisplayName VARCHAR(255),publishedAt VARCHAR(255))")    
-
-                #st.dataframe(SQL_channel_details_df)
 
                 for each_row in range(len(SQL_channel_details_df)):
                     val = tuple(SQL_channel_details_df.loc[each_row])
@@ -244,8 +214,8 @@ if __name__ == "__main__":
                     cursor.execute(sql,val)
                     mydb.commit()
 
-                st.write("Finished loading details to SQL ")
-                st.write("please navigate to next page")
+                st.write(":green[Finished loading details to SQL database]")
+                st.write("navigate to next page in sidebar to proceed")
 
         except Error as e:
             st.write("Error while connecting to MySQL", e)
@@ -254,7 +224,7 @@ if __name__ == "__main__":
         
        
     else:
-         st.write("click 'to SQL' to load the filtered data in SQL db")
+         st.write(":red[click 'Load to SQL database' to load the filtered data]")
 
 
     
