@@ -10,7 +10,24 @@ Divided the entire project into three pages in streamlit for the ease of access 
 https://www.thepythoncode.com/article/using-youtube-api-in-python
 
 **1. Youtube_Data_Harvesting (Explained)**
+    - Created a function to authorize API request. 
+    - pinged to Mongo DB atlas for a connection and printed the result of ping.
+    - getting an input of number of youtube channels that the user is planning to assess in the sidebar.
+    - as per the number input, input boxes are created to get channel ids of the respective channels to be assessed.
+    - after typing the channels ids we click get details to proceed.
+    - In the next part of the function we get channels details using the channel id provided and save it in a dictionary. Later this dictionary is access to get the required details of the channel and saved in Mongo DB.
+    - similar to the above, playlists present in the channel are retrived using the channel id and later moved from dictionary to Mongo DB.
+    - playlist ids from the playlist details are extracted and used to get playlist items details which provides details about the playlist like videos inside the playlist. this is also later saved in Mongo DB.
+    - video ids present in the playlist items details are used to retrive video details and like before is stored in Mongo DB.
+    - once all the above functions are completed with error a completion message is printed and navigation guidelike is printed requesting the user to move to next page from sidebar.
+
 **2. Creating DataFrames and Loading the SQL Database (Explained)**
+    - In this function data stored in the Mongo DB is extracted and stored in the form of a DataFrame so that we can transform.
+    - Channel details are saved as it is in a dataframe.
+    - playlist details and playlist items details are merged on playlist id to form a new dataframe that has all the required fields.
+    - video details dataframe is transformed like published date column in converted to datetime, etc.
+    - at last comment details dataframe is created as such in Mongo DB.
+
 **3. Querying SQL Database (Explained)**
 
 
