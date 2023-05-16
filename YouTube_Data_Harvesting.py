@@ -95,7 +95,8 @@ def playlistitem_details_to_mongo_db(pl_item_of_each_pl_id):
 
 def video_details_to_mongo_db(vid_list):
     for each_item in vid_list:
-        vid_details = {'video_details':{
+        try:
+            vid_details = {'video_details':{
                     'Video_id' :each_item['id'],
                     'video_publishedAt':each_item['snippet']['publishedAt'],
                     'channelId':each_item['snippet']['channelId'],
@@ -107,8 +108,23 @@ def video_details_to_mongo_db(vid_list):
                     'viewCount':each_item['statistics']['viewCount'],
                     'likeCount':each_item['statistics']['likeCount'],
                     'favoriteCount':each_item['statistics']['favoriteCount'],
-                    'commentCount':   
-                        '-1' if (each_item['statistics']['commentCount']==KeyError)  else each_item['statistics']['commentCount']
+                    'commentCount': each_item['statistics']['commentCount']
+                 }
+                  }
+        except:
+            vid_details = {'video_details':{
+                    'Video_id' :each_item['id'],
+                    'video_publishedAt':each_item['snippet']['publishedAt'],
+                    'channelId':each_item['snippet']['channelId'],
+                    'video_title':each_item['snippet']['title'],
+                    'description':each_item['snippet']['description'],
+                    'thumbnail_url':each_item['snippet']['thumbnails']['default']['url'],
+                    'channelTitle':each_item['snippet']['channelTitle'],
+                    'duration':each_item['contentDetails']['duration'],
+                    'viewCount':each_item['statistics']['viewCount'],
+                    'likeCount':each_item['statistics']['likeCount'],
+                    'favoriteCount':each_item['statistics']['favoriteCount'],
+                    'commentCount': -1 
                  }
                   }
         video_db.insert_one(vid_details)

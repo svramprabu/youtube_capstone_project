@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -82,14 +83,24 @@ if __name__ == "__main__":
     video_df['video_publishedAt']= pd.to_datetime(video_df['video_publishedAt'])
     video_df=pd.merge(video_df,pl_items_df)
     playlist_df=playlist_df.drop(['Video_id'], axis=1)
-
-    for each_item in video_df['duration']:
-        try:
+    # video_df['new_dur']=np.nan
+    def convert_row(each_item):
+        if each_item.__contains__('M')&each_item.__contains__('S'):
             minutes = int(each_item[2:].split('M')[0])
             total_seconds = int(each_item[2:].split('M')[1][:-1]) + (minutes*60)
-            video_df.loc[video_df['duration']==each_item,'duration']=str(total_seconds)
-        except:
-            pass
+            # video_df['new_dur'].loc[each_item]=total_seconds
+            return total_seconds
+            # video_df.loc[video_df['duration']==each_item,'duration']=str(total_seconds)
+        elif each_item.__contains__('M') & (each_item.__contains__('S')==False):
+            minutes = int(each_item[2:].split('M')[0])
+            return minutes
+
+            # video_df.loc[video_df['duration']==each_item,'duration']=str(minutes)
+        else:            
+            # total_seconds = each_item[2:-1]
+            return each_item[2:-1]
+            # video_df.loc[video_df['duration']==each_item,'duration']=str(total_seconds)
+    video_df['duration'] = video_df['duration'].apply(lambda row : convert_row(row))            
 
     
     # comment details to dataframe

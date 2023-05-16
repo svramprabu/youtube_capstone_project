@@ -45,7 +45,7 @@ if __name__ == "__main__":
                 st.write(ans3[['video_title','channelTitle','viewCount']])
 
             if st.button("Q4 How many comments were made on each video, and what are their corresponding video names?"):
-                Q4 = "SELECT video_det.video_title, comment_det.video_id,count(comment_det.comment_id) AS no_of_comments FROM comment_det INNER JOIN video_det ON video_det.video_id=comment_det.video_id group by video_id"
+                Q4 = "SELECT video_det.video_title, video_det.video_id,count(comment_det.comment_id) AS no_of_comments FROM video_det LEFT JOIN comment_det ON video_det.video_id=comment_det.video_id group by video_id"
                 ans4=pd.read_sql(Q4,mydb)
                 st.write(f"Query: {Q4}")
                 st.write(ans4)
