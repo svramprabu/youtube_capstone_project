@@ -2,6 +2,7 @@
 #mysql
 mysql-connector-python
 streamlit
+streamlit-extras
 pandas
 pymongo
 
