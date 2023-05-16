@@ -27,27 +27,12 @@ https://www.thepythoncode.com/article/using-youtube-api-in-python
     - playlist details and playlist items details are merged on playlist id to form a new dataframe that has all the required fields.
     - video details dataframe is transformed like published date column in converted to datetime, etc.
     - at last comment details dataframe is created as such in Mongo DB.
+    - now the user is requested to click a button to send all the dataframes to a SQL database.
+    - the SQL database is pinged for a connection.
+    - all the datas in the dataframe are loaded in the database just how it is present in the dataframe.
+    - user is requested to navigate to next page in the sidebar while the dataframes are displayed for reference.
 
 **3. Querying SQL Database (Explained)**
-
-
-As the first part of the project is to extract the data from YouTube I created a Google developer account and from there generated API Key and OAuth 2.0 key to get authenticated to pull data from YouTube.
-
-After this used the sample code that is used to find the YouTube Channel details using the Channel ID.
-
-Meanwhile created a text box to input the Channel ID.
-
-The function returned a dictionary file from which I was able locate details like Channel name, Channel ID, Subscription Count, Channel Views, and Description.
-
-Inorder to take multiple Channel IDs as input created a number input box and iterated to store the channel details in a Dictionary.
-Migrated this dictionary data to MongoDB.
-
-Using find function in MongoDB filtered to find the channel name that is to be used in the dropdown box list of all the channels given as input so far.
-
-created a dataframe of channel details, playlist details, video details and comment details for the chosen channel in the dropdown. 
-
-later these dataframes are loaded into sql table after some transformation. 
-
-Finally some queries are inserted in the dropdown to answer the questions raised. 
+    - all the queries mentioned in the project description document are answered one by one by queries created and resultant sql table is received as a dataframe and displayed below.
 
 
