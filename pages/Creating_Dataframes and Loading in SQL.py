@@ -221,7 +221,69 @@ if __name__ == "__main__":
         except Error as e:
             st.write("Error while connecting to MySQL", e)
       
-  
+    elif st.button("Load to planet scale SQL database"):
+        
+        import mysql.connector
+        from mysql.connector import Error
+
+        try:
+            mydb = mysql.connector.connect(host=st.secrets["sqlhost"],
+                                                 database=st.secrets["sqldb"],
+                                                 user=st.secrets["sqldb_username"],
+                                                 password=st.secrets["sqldb_pwd"])
+                                                # port=sql_port_no)
+            if mydb.is_connected():
+                db_Info = mydb.get_server_info()
+                st.write("Connected to planet scale MySQL Server version ", db_Info)
+                cursor = mydb.cursor()
+                cursor.execute("select database();")
+                record = cursor.fetchone()
+                st.write("You're connected to database: ", record)
+
+                cursor.execute("drop table if exists comment_det")
+                cursor.execute("drop table if exists video_det")
+                cursor.execute("drop table if exists playlist_det")
+                cursor.execute("drop table if exists channel_det")
+
+                cursor.execute("create table if not exists channel_det(Channel_Name VARCHAR(255),Channel_Id VARCHAR(255) PRIMARY KEY,Subscription_Count INT,Channel_Views BIGINT,Channel_Description TEXT,Number_of_Videos INT)")
+                cursor.execute("create table if not exists playlist_det(playlist_id VARCHAR(255) PRIMARY KEY, Channel_id VARCHAR(255),  Playlist_title VARCHAR(255), Playlist_video_count INT)")
+                cursor.execute("create table if not exists video_det(video_id VARCHAR(255) PRIMARY KEY, video_publishedAt VARCHAR(255), Channel_id VARCHAR(255), video_title TEXT, Video_description TEXT,thumbnail_url VARCHAR(255), channelTitle VARCHAR(255), duration INT, viewCount INT, likeCount INT,favoriteCount INT, commentCount INT, playlist_id VARCHAR(255))")
+                cursor.execute("create table if not exists comment_det(comment_id VARCHAR(255) PRIMARY KEY, video_id VARCHAR(255),textDisplay TEXT, authorDisplayName VARCHAR(255),publishedAt VARCHAR(255))")    
+
+                for each_row in range(len(SQL_channel_details_df)):
+                    val = tuple(SQL_channel_details_df.loc[each_row])
+                    sql = "insert into channel_det values (%s,%s,%s,%s,%s,%s)"
+                    cursor.execute(sql,val)
+                    mydb.commit()
+
+
+                for each_row in SQL_plalist_df.index:
+                    val=tuple(SQL_plalist_df.values[each_row])
+                    # st.write(val)
+                    sql = "insert into playlist_det values (%s,%s,%s,%s)"
+                    cursor.execute(sql,val)
+                    mydb.commit()   
+
+                for each_row in SQL_video_df.index:
+                    val=tuple(SQL_video_df.values[each_row])
+                    sql = "insert into video_det values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                    cursor.execute(sql,val)
+                    mydb.commit()   
+
+                for each_row in SQL_comments_df.index:
+                    val=tuple(SQL_comments_df.values[each_row])
+                    sql = "insert into comment_det values (%s,%s,%s,%s,%s)"
+                    cursor.execute(sql,val)
+                    mydb.commit()
+
+                st.write(":green[Finished loading details to SQL database]")
+                st.write("navigate to next page in sidebar to proceed")
+
+
+        except Error as e:
+            st.write("Error while connecting to planet scale MySQL", e)
+
+
     else:
          st.write(":red[click 'Load to SQL database' to load the filtered data]")
 

@@ -193,7 +193,8 @@ if __name__ == "__main__":
     if st.button("PROCEED"):
             
         st.write("Processing...")
-        url = "mongodb+srv://svrdb:svrnoobs@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
+        pwd = st.secrets["mongodb_pwd"]
+        url = f"mongodb+srv://svrdb:{pwd}@ytdatabysvr.0dp48ba.mongodb.net/?retryWrites=true&w=majority"
 
         # Create a new client and connect to the server
         client = MongoClient(url, server_api=ServerApi('1'))
