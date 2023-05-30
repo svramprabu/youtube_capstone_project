@@ -161,7 +161,7 @@ if __name__ == "__main__":
     sql_port_no = st.sidebar.number_input("enter the MySql db port number",value=3306)
 
 
-    if st.button("Load to SQL database"):
+    if st.button("Load to MySQL database"):
         
         import mysql.connector
         from mysql.connector import Error
@@ -221,7 +221,7 @@ if __name__ == "__main__":
         except Error as e:
             st.write("Error while connecting to MySQL", e)
       
-    elif st.button("Load to planet scale SQL database"):
+    elif st.button("Load to planet scale MySQL database"):
         
         import mysql.connector
         from mysql.connector import Error
@@ -278,7 +278,6 @@ if __name__ == "__main__":
 
                 st.write(":green[Finished loading details to SQL database]")
                 st.write("navigate to next page in sidebar to proceed")
-
 
         except Error as e:
             st.write("Error while connecting to planet scale MySQL", e)
