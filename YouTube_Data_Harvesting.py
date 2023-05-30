@@ -26,7 +26,7 @@ def get_playlist_details(_youtube, **kwargs):
     return youtube.playlists().list(
         part="snippet,contentDetails",
         **kwargs,
-        maxResults=10
+        maxResults=5
         ).execute()
 
 @st.cache_data
@@ -34,7 +34,7 @@ def get_playlistitems_details(_youtube, pl_id):
 
     return youtube.playlistItems().list(
         part="snippet,contentDetails",
-        maxResults=10,
+        maxResults=5,
         playlistId=pl_id
         ).execute() 
 
@@ -42,7 +42,7 @@ def get_playlistitems_details(_youtube, pl_id):
 def get_video_details(_youtube, **kwargs):
     return youtube.videos().list(
         part="snippet,contentDetails,statistics",
-        maxResults=10,
+        maxResults=5,
         **kwargs
         ).execute()
 
@@ -50,12 +50,12 @@ def get_video_details(_youtube, **kwargs):
 def get_comment_details(_youtube, video_id):
     return youtube.commentThreads().list(
         part="snippet,replies",
-        maxResults=10,
+        maxResults=5,
         videoId=video_id
         ).execute()    
 
 def channel_details_to_mongo_db(data):
-    
+
     ch_details = {
             "channelTitle": data['items'][0]['snippet']['title'],
             "channelId": data['items'][0]['id'],
@@ -65,8 +65,7 @@ def channel_details_to_mongo_db(data):
             "videoCount": data['items'][0]['statistics']['videoCount'],
             "playlist_details": playlist_details_to_mongo_db (data['items'][0]['id'])
 
-        }
-    
+                }
     channel_db.insert_one(ch_details)
 
 def playlist_details_to_mongo_db(channel_id):
@@ -86,7 +85,11 @@ def playlist_details_to_mongo_db(channel_id):
                         'videoId':j['contentDetails']['videoId'],
                         'Video_details': video_details_to_mongo_db(j['contentDetails']['videoId'])
                                                 })
-        playlistitems_db.insert_many(pl_items)
+        # st.write(pl_items)
+        try:
+            playlistitems_db.insert_many(pl_items)
+        except:
+            pass
         pl_det.append({
                     'playlistId' :i['id'],
                     'channelId' :i['snippet']['channelId'],
@@ -95,7 +98,7 @@ def playlist_details_to_mongo_db(channel_id):
                     'Playlist_video_count' :i['contentDetails']['itemCount'],
                     'playlistitem_details' : pl_items
                                     })
-                                
+    # st.write(pl_det)                                
     playlist_det = playlist_db.insert_many(pl_det)
     return playlist_det.inserted_ids
 
@@ -218,25 +221,7 @@ if __name__ == "__main__":
 
         for each_id in user_input_channel_ids:
             channel_details_to_mongo_db(get_channel_details(youtube,id=each_id))
-            # channels[each_id] = get_channel_details(youtube,id=each_id)
-            # playlist[each_id] = get_playlist_details(youtube, channelId = each_id)
-            # channel_details_to_mongo_db(channels[each_id])
-            # playlist_ids.setdefault(each_id,[])
-            # for each_pl in playlist[each_id]['items']:
-            #     playlist_ids[each_id].append(each_pl['id'])
-            # playlist_details_to_mongo_db(playlist[each_id])
-            # for each_pl_id in playlist_ids[each_id]:
-            #     playlistitems[each_pl_id]= get_playlistitems_details(youtube, each_pl_id)
-            #     playlistitem_details_to_mongo_db(playlistitems[each_pl_id]) 
-            #     for v_id in playlistitems[each_pl_id]['items']:
-            #         video_details[v_id['contentDetails']['videoId']] = get_video_details(youtube, id = v_id['contentDetails']['videoId'])
-            #         video_details_to_mongo_db(video_details[v_id['contentDetails']['videoId']]['items'])
-            #         try:      
-            #             comment_details[v_id['contentDetails']['videoId']] = get_comment_details(youtube, v_id['contentDetails']['videoId'])
-            #             comment_details_to_mongo_db(comment_details[v_id['contentDetails']['videoId']]['items'])
-            #         except:
-            #             comment_details[v_id['contentDetails']['videoId']] = 'none'
         st.write(":green[Completed successfully.]")
-        st.write("please navigate to next page in sidebar" )      
+        st.write("please navigate to next page in the sidebar" )      
     else:
         st.write(":red[click proceed to get data using API and migrate them to Mongo DB Atlas]")     

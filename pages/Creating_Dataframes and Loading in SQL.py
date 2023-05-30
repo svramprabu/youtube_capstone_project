@@ -48,7 +48,7 @@ if __name__ == "__main__":
         st.write("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         st.write(e)
-    st.write("Retriving Data from Mongo DB for Transformation...")
+    st.write("Lets retrive Data from Mongo DB for Transformation...")
 
     yt_dbs = client['yt_dbs']
 
@@ -60,77 +60,24 @@ if __name__ == "__main__":
 
             #channel df creation
     channels_df = pd.DataFrame(list(channel_db.find({},{'_id':0,'playlist_details':0})))
-    # for each_channel_id in channel_db.find():
-    #     col_channel = list(each_channel_id['Channel_Details'].keys())
-    #     break
-    # channels_df = pd.DataFrame(columns = col_channel)        
-    # for each_channel_id in channel_db.find():
-    #     channels_df=pd.concat([channels_df, pd.Series(each_channel_id['Channel_Details']).to_frame().T],ignore_index=True)
-
+    
             #playlist df creation
     playlist_df = pd.DataFrame(list(playlist_db.find({},{'_id':0,'playlistitem_details':0})))
-    # for each_pl in playlist_db.find():
-    #     col_name_pl=list(each_pl['playlist_details'].keys())
-    #     break
-    # playlist_df = pd.DataFrame(columns=col_name_pl) 
-
-    # for each_pl in playlist_db.find():
-    #     playlist_df=pd.concat([playlist_df,pd.Series(each_pl['playlist_details']).to_frame().T],ignore_index=True)
-
-    # playlist_df=playlist_df.drop(['playlist_description'],axis=1)
-
-    
-
+   
             #playlist items data frame creation
     pl_items_df = pd.DataFrame(list(playlistitems_db.find({},{'_id':0,'Video_details':0})))
-    # for i in playlistitems_db.find():
-    #         col_pl_item_names = list(i['playlistitem_details'].keys())
-    #         break
-    # pl_items_df = pd.DataFrame(columns=col_pl_item_names)
-
-    # for i in playlistitems_db.find():
-    #     pl_items_df=pd.concat([pl_items_df,pd.Series(i['playlistitem_details']).to_frame().T],ignore_index=True)
     
-    # playlist_df = pd.merge(pl_items_df, playlist_df, on=['playlist_id','channelId'])
-    # playlist_df=playlist_df.drop_duplicates(subset=['playlist_id'])
-
-
             # video details to dataframe
-    video_df = pd.DataFrame(list(video_db.find({},{'_id':0,'commentDetails':0})))
-            
-    # for i in video_db.find():
-    #         vid_col_names=list(i['video_details'].keys())
-    #         break
-    # video_df=pd.DataFrame(columns=vid_col_names)
-    # for i in video_db.find():
-    #     video_df=pd.concat([video_df,pd.Series(i['video_details']).to_frame().T],ignore_index=True)
-    
+    video_df = pd.DataFrame(list(video_db.find({},{'_id':0,'commentDetails':0})))    
     video_df['video_publishedAt']= pd.to_datetime(video_df['video_publishedAt'])
-    # video_df=pd.merge(video_df,pl_items_df)
-    # playlist_df=playlist_df.drop(['Video_id'], axis=1)
-
     video_df['duration'] = video_df['duration'].apply(lambda row : convert_duration(row))            
     video_df = video_df.merge(pl_items_df,how='inner')
 
-    # comment details to dataframe
+            # comment details to dataframe
     comment_df = pd.DataFrame(list(comment_db.find({},{'_id':0})))
-
-    # for i in comment_db.find():
-    #     comment_col_names=list(i['Comment_details'].keys())
-    #     break
-    # comment_df = pd.DataFrame(columns=comment_col_names)
-
-    # for i in comment_db.find():
-    #     comment_df=pd.concat([comment_df,pd.Series(i['Comment_details']).to_frame().T],ignore_index=True)
     comment_df['publishedAt']= pd.to_datetime(comment_df['publishedAt'])
 
-
-
-    # st.write(channels_df)
-    # st.write(playlist_df)
-    # st.write(pl_items_df)
-    # st.write(video_df)
-    # st.write(comment_df)
+            #merging all details into one table 
     final_df = channels_df.merge(playlist_df,how='left')
     final_df = final_df.merge(video_df,how= 'right',on=['playlistId','channelTitle','channelId'])
     final_df = final_df.merge(comment_df,how='left',on='videoId')
@@ -147,62 +94,65 @@ if __name__ == "__main__":
         tuple(dropdown))
 
     # if st.button('channels chosen from dropdown'):
-
-    for option in options:
+    st.write(":red[select from options above to get details of those channels from Mongo DB]")
+    try:        
+        for option in options:
+                
+            try:
+                a=SQL_channel_details_df.head()
+            except:
+                SQL_channel_details_df=pd.DataFrame()
             
-        try:
-            a=SQL_channel_details_df.head()
-        except:
-            SQL_channel_details_df=pd.DataFrame()
+            SQL_channel_details_df=pd.concat([SQL_channel_details_df,channels_df[channels_df['channelTitle']==option]])
         
-        SQL_channel_details_df=pd.concat([SQL_channel_details_df,channels_df[channels_df['channelTitle']==option]])
+            try:
+                b=SQL_plalist_df.head()
+            except:
+                SQL_plalist_df=pd.DataFrame()
+
+            #CHANNEL_ID=channels_df[channels_df['Channel_Name']==option].index[0]
+
+            SQL_plalist_df = pd.concat([SQL_plalist_df ,playlist_df[playlist_df['channelId']==(channels_df[channels_df['channelTitle']==option]['channelId'].values[0])]])
+            
+            try:
+                c=SQL_video_df.head()
+            except:
+                SQL_video_df=pd.DataFrame()
+            try:
+                d=SQL_comments_df.head()
+            except:
+                SQL_comments_df=pd.DataFrame()
+
+            for each_pl_id in set(SQL_plalist_df['playlistId']):
+
+                SQL_video_df=pd.concat([SQL_video_df,video_df[video_df['playlistId']==each_pl_id]])
+
+            for each_v_id in set(SQL_video_df['videoId']):
+
+                SQL_comments_df=pd.concat([SQL_comments_df,comment_df[comment_df['videoId']==each_v_id]])
+
+        SQL_channel_details_df.reset_index(inplace = True, drop = True)
+        SQL_plalist_df.reset_index(inplace = True, drop = True)
+        SQL_video_df=SQL_video_df.drop_duplicates(subset=['videoId'])
+        SQL_video_df.reset_index(inplace = True, drop = True)
+        SQL_comments_df=SQL_comments_df.drop_duplicates(subset=['commentId'])
+        SQL_comments_df.reset_index(inplace = True, drop = True)
+
     
-        try:
-            b=SQL_plalist_df.head()
-        except:
-            SQL_plalist_df=pd.DataFrame()
-
-        #CHANNEL_ID=channels_df[channels_df['Channel_Name']==option].index[0]
-
-        SQL_plalist_df = pd.concat([SQL_plalist_df ,playlist_df[playlist_df['channelId']==(channels_df[channels_df['channelTitle']==option]['channelId'].values[0])]])
-        
-        try:
-            c=SQL_video_df.head()
-        except:
-            SQL_video_df=pd.DataFrame()
-        try:
-            d=SQL_comments_df.head()
-        except:
-            SQL_comments_df=pd.DataFrame()
-
-        for each_pl_id in set(SQL_plalist_df['playlistId']):
-
-            SQL_video_df=pd.concat([SQL_video_df,video_df[video_df['playlistId']==each_pl_id]])
-
-        for each_v_id in set(SQL_video_df['videoId']):
-
-            SQL_comments_df=pd.concat([SQL_comments_df,comment_df[comment_df['videoId']==each_v_id]])
-
-    SQL_channel_details_df.reset_index(inplace = True, drop = True)
-    SQL_plalist_df.reset_index(inplace = True, drop = True)
-    SQL_video_df=SQL_video_df.drop_duplicates(subset=['videoId'])
-    SQL_video_df.reset_index(inplace = True, drop = True)
-    SQL_comments_df=SQL_comments_df.drop_duplicates(subset=['commentId'])
-    SQL_comments_df.reset_index(inplace = True, drop = True)
-    
-    st.header(":blue[Channel Details]")
-    st.dataframe(SQL_channel_details_df)
-    st.header(":blue[Playlist Details]")
-    st.dataframe(SQL_plalist_df)
-    st.header(":blue[Video Details]")
-    st.dataframe(SQL_video_df)
-    st.header(":blue[Comments Details]")
-    st.dataframe(SQL_comments_df)
+        st.header(":blue[Channel Details]")
+        st.dataframe(SQL_channel_details_df)
+        st.header(":blue[Playlist Details]")
+        st.dataframe(SQL_plalist_df)
+        st.header(":blue[Video Details]")
+        st.dataframe(SQL_video_df)
+        st.header(":blue[Comments Details]")
+        st.dataframe(SQL_comments_df)
+    except:
+        pass
 
 
         
     # else:
-    #     st.write(":red[select from options above to get details of those channels from Mongo DB]")
 
     sql_host_name = st.sidebar.text_input("MySql host")
     sql_username = st.sidebar.text_input("MySql database username")
@@ -271,6 +221,7 @@ if __name__ == "__main__":
         except Error as e:
             st.write("Error while connecting to MySQL", e)
       
+  
     else:
          st.write(":red[click 'Load to SQL database' to load the filtered data]")
 
