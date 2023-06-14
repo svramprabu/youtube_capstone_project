@@ -42,7 +42,7 @@ def get_playlistitems_details(_youtube, pl_id):
 def get_video_details(_youtube, **kwargs):
     return youtube.videos().list(
         part="snippet,contentDetails,statistics",
-        maxResults=10,
+        maxResults=5,
         **kwargs
         ).execute()
 
