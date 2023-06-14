@@ -23,7 +23,8 @@ if __name__ == "__main__":
                 record = cursor.fetchone()
                 st.write(f"You're connected to database:  {record}")
         
-    
+            sql_database=st.secrets["sqldb"]
+            
             if st.button(" Q1 What are the names of all the videos and their corresponding channels?"):
                 Q1="SELECT video_det.video_title, video_det.ChannelTitle FROM video_det LEFT JOIN playlist_det ON video_det.playlist_id=playlist_det.playlist_id"
                 ans1 = pd.read_sql(Q1,mydb)
