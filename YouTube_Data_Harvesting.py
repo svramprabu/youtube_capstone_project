@@ -50,7 +50,7 @@ def get_video_details(_youtube, **kwargs):
 def get_comment_details(_youtube, video_id):
     return youtube.commentThreads().list(
         part="snippet,replies",
-        maxResults=10,
+        maxResults=5,
         videoId=video_id
         ).execute()    
 
