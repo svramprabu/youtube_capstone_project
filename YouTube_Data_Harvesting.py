@@ -26,7 +26,7 @@ def get_playlist_details(_youtube, **kwargs):
     return youtube.playlists().list(
         part="snippet,contentDetails",
         **kwargs,
-        maxResults=5
+        maxResults=10
         ).execute()
 
 @st.cache_data
@@ -34,7 +34,7 @@ def get_playlistitems_details(_youtube, pl_id):
 
     return youtube.playlistItems().list(
         part="snippet,contentDetails",
-        maxResults=5,
+        maxResults=10,
         playlistId=pl_id
         ).execute() 
 
@@ -42,7 +42,7 @@ def get_playlistitems_details(_youtube, pl_id):
 def get_video_details(_youtube, **kwargs):
     return youtube.videos().list(
         part="snippet,contentDetails,statistics",
-        maxResults=5,
+        maxResults=10,
         **kwargs
         ).execute()
 
@@ -50,7 +50,7 @@ def get_video_details(_youtube, **kwargs):
 def get_comment_details(_youtube, video_id):
     return youtube.commentThreads().list(
         part="snippet,replies",
-        maxResults=5,
+        maxResults=10,
         videoId=video_id
         ).execute()    
 
