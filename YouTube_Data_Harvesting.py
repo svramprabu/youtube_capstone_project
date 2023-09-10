@@ -90,6 +90,12 @@ def playlist_details_to_mongo_db(channel_id):
             playlistitems_db.insert_many(pl_items)
         except:
             pass
+            # pl_items={ 'channelId':'pl_item_det['items']['snippet']['channelId']',   £
+            #                 'channelTitle':j['snippet']['channelTitle'],
+            #             'playlistId':j['snippet']['playlistId'],
+            #             'videoId':j['contentDetails']['videoId'],
+            #             'Video_details': video_details_to_mongo_db(j['contentDetails']['videoId'])
+            #                                     }
         pl_det.append({
                     'playlistId' :i['id'],
                     'channelId' :i['snippet']['channelId'],
@@ -186,10 +192,11 @@ if __name__ == "__main__":
     
 
     number = st.sidebar.number_input(':red[Enter the number of channels you wish to extract]',value=1,min_value=1,max_value=10)      
-    st.write("you can find the :green[channel ID] of any youtube channel if the share button in the about section is clicked (or)") 
-    st.write("go to this link to find it :green[https://commentpicker.com/youtube-channel-id.php] ")
+    st.write("you can find the :green[channel ID] of any youtube channel \n \
+             if the share button found in the about section in the channel page is clicked \n (or) \n \
+             go to this link to find it :green[https://commentpicker.com/youtube-channel-id.php] ")
     for i in range(number):
-        user_input_channel_ids.append(st.text_input("enter",key=i))
+        user_input_channel_ids.append(st.text_input("enter/paste the ChannelID here",key=i))
     if st.button("PROCEED"):
             
         st.write("Processing...")

@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # Send a ping to confirm a successful connection
     try:
         client.admin.command('ping')
-        st.write("Pinged your deployment. You successfully connected to MongoDB!")
+        st.write("Pinged your deployment. You successfully connected to MongoDB Atlas !")
     except Exception as e:
         st.write(e)
     st.write("Lets retrive Data from Mongo DB for Transformation...")
@@ -72,10 +72,13 @@ if __name__ == "__main__":
     video_df['video_publishedAt']= pd.to_datetime(video_df['video_publishedAt'])
     video_df['duration'] = video_df['duration'].apply(lambda row : convert_duration(row))            
     video_df = video_df.merge(pl_items_df,how='inner')
+    video_df = video_df.applymap(str)
 
             # comment details to dataframe
     comment_df = pd.DataFrame(list(comment_db.find({},{'_id':0})))
     comment_df['publishedAt']= pd.to_datetime(comment_df['publishedAt'])
+    comment_df = comment_df.applymap(str)
+
 
             #merging all details into one table 
     final_df = channels_df.merge(playlist_df,how='left')
@@ -148,143 +151,182 @@ if __name__ == "__main__":
         st.header(":blue[Comments Details]")
         st.dataframe(SQL_comments_df)
     except:
-        pass
+        # pass
+        st.write("no channels chosen")
 
 
         
     # else:
 
-    sql_host_name = st.sidebar.text_input("MySql host")
-    sql_username = st.sidebar.text_input("MySql database username")
-    sql_password = st.sidebar.text_input("MySql database password")
-    sql_database = st.sidebar.text_input("MySql database name")
-    sql_port_no = st.sidebar.number_input("enter the MySql db port number",value=3306)
+    # sql_host_name = st.sidebar.text_input("MySql host")
+    # sql_username = st.sidebar.text_input("MySql database username")
+    # sql_password = st.sidebar.text_input("MySql database password")
+    # sql_database = st.sidebar.text_input("MySql database name")
+    # sql_port_no = st.sidebar.number_input("enter the MySql db port number",value=3306)
 
 
-    if st.button("Load to MySQL database"):
+    if st.button("Load to SQLite database"):
         
-        import mysql.connector
-        from mysql.connector import Error
+        # import mysql.connector
+        # from mysql.connector import Error
+        import sqlite3
 
-        try:
-            mydb = mysql.connector.connect(host=sql_host_name,
-                                                 database=sql_database,
-                                                 user=sql_username,
-                                                 password=sql_password,
-                                                port=sql_port_no)
-            if mydb.is_connected():
-                db_Info = mydb.get_server_info()
-                st.write("Connected to MySQL Server version ", db_Info)
-                cursor = mydb.cursor()
-                cursor.execute("select database();")
-                record = cursor.fetchone()
-                st.write("You're connected to database: ", record)
-                cursor.execute("drop table if exists comment_det")
-                cursor.execute("drop table if exists video_det")
-                cursor.execute("drop table if exists playlist_det")
-                cursor.execute("drop table if exists channel_det")
+        
+            # mydb = mysql.connector.connect(host=sql_host_name,
+            #                                      database=sql_database,
+            #                                      user=sql_username,
+            #                                      password=sql_password,
+            #                                     port=sql_port_no)
+        sql_database = 'ytdetail.db'
+        mydb = sqlite3.connect(f'{sql_database}')
 
-                cursor.execute("create table if not exists channel_det(Channel_Name VARCHAR(255),Channel_Id VARCHAR(255) PRIMARY KEY,Subscription_Count INT,Channel_Views BIGINT,Channel_Description TEXT,Number_of_Videos INT)")
-                cursor.execute("create table if not exists playlist_det(playlist_id VARCHAR(255) PRIMARY KEY, Channel_id VARCHAR(255), FOREIGN KEY (Channel_id) REFERENCES channel_det(Channel_Id), Playlist_title VARCHAR(255), Playlist_video_count INT)")
-                cursor.execute("create table if not exists video_det(video_id VARCHAR(255) PRIMARY KEY, video_publishedAt VARCHAR(255), Channel_id VARCHAR(255), video_title TEXT, Video_description TEXT,thumbnail_url VARCHAR(255), channelTitle VARCHAR(255), duration INT, viewCount INT, likeCount INT,favoriteCount INT, commentCount INT, playlist_id VARCHAR(255), FOREIGN KEY (playlist_id) REFERENCES playlist_det(playlist_id))")
-                cursor.execute("create table if not exists comment_det(comment_id VARCHAR(255) PRIMARY KEY, video_id VARCHAR(255), FOREIGN KEY (video_id) REFERENCES video_det(video_id),textDisplay TEXT, authorDisplayName VARCHAR(255),publishedAt VARCHAR(255))")    
+        if mydb is not None : # and not mydb.closed:
+            print("SQLite connection is open")
+        
+        # if mydb.is_connected():
+            # db_Info = mydb.get_server_info()
+            # st.write("Connected to MySQL Server version ", db_Info)
+            cursor = mydb.cursor()
+            # cursor.execute("select database();")
+            # record = cursor.fetchone()
+            st.write("You're connected to database: ", sql_database)
+            cursor.execute("drop table if exists comment_det")
+            cursor.execute("drop table if exists video_det")
+            cursor.execute("drop table if exists playlist_det")
+            cursor.execute("drop table if exists channel_det")
 
-                for each_row in range(len(SQL_channel_details_df)):
-                    val = tuple(SQL_channel_details_df.loc[each_row])
-                    sql = "insert into channel_det values (%s,%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()
+            cursor.execute("create table if not exists channel_det(Channel_Name TEXT,\
+                           Channel_id TEXT PRIMARY KEY,\
+                           Subscription_Count INTEGER,\
+                           Channel_Views INTEGER,\
+                           Channel_Description TEXT,\
+                           Number_of_Videos INTEGER)")
+            cursor.execute("create table if not exists playlist_det(playlist_id TEXT PRIMARY KEY, \
+                           Channel_id TEXT, \
+                           Playlist_title TEXT, \
+                           Playlist_video_count INTEGER,\
+                           CONSTRAINT fk_channel_det FOREIGN KEY (Channel_id) REFERENCES channel_det(Channel_id))")
+            cursor.execute("create table if not exists video_det(video_id TEXT PRIMARY KEY, \
+                           video_publishedAt TEXT, \
+                           Channel_id TEXT, \
+                           video_title TEXT, \
+                           Video_description TEXT,\
+                           thumbnail_url TEXT, \
+                           channelTitle TEXT, \
+                           duration INTEGER, \
+                           viewCount INTEGER, \
+                           likeCount INTEGER,\
+                           favoriteCount INTEGER, \
+                           commentCount INTEGER, \
+                           playlist_id TEXT, \
+                           CONSTRAINT fk_playlist_det FOREIGN KEY (playlist_id) REFERENCES playlist_det(playlist_id))")
+            cursor.execute("create table if not exists comment_det(comment_id TEXT PRIMARY KEY, \
+                           video_id TEXT, \
+                           textDisplay TEXT, \
+                           authorDisplayName TEXT,\
+                           publishedAt TEXT,\
+                           CONSTRAINT fk_video_det FOREIGN KEY (video_id) REFERENCES video_det(video_id))")    
+            st.write("created tables in database")
+
+            for each_row in range(len(SQL_channel_details_df)):
+                val = tuple(SQL_channel_details_df.loc[each_row])
+                sql = "insert into channel_det values (?,?,?,?,?,?)"
+                cursor.execute(sql,val)
+                mydb.commit()
 
 
-                for each_row in SQL_plalist_df.index:
-                    val=tuple(SQL_plalist_df.values[each_row])
-                    # st.write(val)
-                    sql = "insert into playlist_det values (%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()   
+            for each_row in SQL_plalist_df.index:
+                val=tuple(SQL_plalist_df.values[each_row])
+                # st.write(val)
+                sql = "insert into playlist_det values (?,?,?,?)"
+                cursor.execute(sql,val)
+                mydb.commit()   
 
-                for each_row in SQL_video_df.index:
-                    val=tuple(SQL_video_df.values[each_row])
-                    sql = "insert into video_det values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()   
+            for each_row in SQL_video_df.index:
+                val=tuple(SQL_video_df.values[each_row])
+                sql = "insert into video_det values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                cursor.execute(sql,val)
+                mydb.commit()   
 
-                for each_row in SQL_comments_df.index:
-                    val=tuple(SQL_comments_df.values[each_row])
-                    sql = "insert into comment_det values (%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()
+            for each_row in SQL_comments_df.index:
+                val=tuple(SQL_comments_df.values[each_row])
+                sql = "insert into comment_det values (?,?,?,?,?)"
+                cursor.execute(sql,val)
+                mydb.commit()
 
-                st.write(":green[Finished loading details to SQL database]")
-                st.write("navigate to next page in sidebar to proceed")
-
-        except Error as e:
-            st.write("Error while connecting to MySQL", e)
+            st.write(":green[Finished loading details to SQL database]")
+            st.write("navigate to next page in sidebar to proceed")
+            mydb.close()
+    
+        else:
+            print("SQLite connection is closed")
+        # except Error as e:
+       
       
-    elif st.button("Load to planet scale MySQL database"):
+    # elif st.button("Load to planet scale MySQL database"):
         
-        import mysql.connector
-        from mysql.connector import Error
+    #     import mysql.connector
+    #     from mysql.connector import Error
 
-        try:
-            mydb = mysql.connector.connect(host=st.secrets["sqlhost"],
-                                                 database=st.secrets["sqldb"],
-                                                 user=st.secrets["sqldb_username"],
-                                                 password=st.secrets["sqldb_pwd"])
-                                                # port=sql_port_no)
-            if mydb.is_connected():
-                db_Info = mydb.get_server_info()
-                st.write("Connected to planet scale MySQL Server version ", db_Info)
-                cursor = mydb.cursor()
-                cursor.execute("select database();")
-                record = cursor.fetchone()
-                st.write("You're connected to database: ", record)
+    #     try:
+    #         mydb = mysql.connector.connect(host=st.secrets["sqlhost"],
+    #                                              database=st.secrets["sqldb"],
+    #                                              user=st.secrets["sqldb_username"],
+    #                                              password=st.secrets["sqldb_pwd"])
+    #                                             # port=sql_port_no)
+    #         if mydb.is_connected():
+    #             db_Info = mydb.get_server_info()
+    #             st.write("Connected to planet scale MySQL Server version ", db_Info)
+    #             cursor = mydb.cursor()
+    #             cursor.execute("select database();")
+    #             record = cursor.fetchone()
+    #             st.write("You're connected to database: ", record)
 
-                cursor.execute("drop table if exists comment_det")
-                cursor.execute("drop table if exists video_det")
-                cursor.execute("drop table if exists playlist_det")
-                cursor.execute("drop table if exists channel_det")
+    #             cursor.execute("drop table if exists comment_det")
+    #             cursor.execute("drop table if exists video_det")
+    #             cursor.execute("drop table if exists playlist_det")
+    #             cursor.execute("drop table if exists channel_det")
 
-                cursor.execute("create table if not exists channel_det(Channel_Name VARCHAR(255),Channel_Id VARCHAR(255) PRIMARY KEY,Subscription_Count INT,Channel_Views BIGINT,Channel_Description TEXT,Number_of_Videos INT)")
-                cursor.execute("create table if not exists playlist_det(playlist_id VARCHAR(255) PRIMARY KEY, Channel_id VARCHAR(255),  Playlist_title VARCHAR(255), Playlist_video_count INT)")
-                cursor.execute("create table if not exists video_det(video_id VARCHAR(255) PRIMARY KEY, video_publishedAt VARCHAR(255), Channel_id VARCHAR(255), video_title TEXT, Video_description TEXT,thumbnail_url VARCHAR(255), channelTitle VARCHAR(255), duration INT, viewCount INT, likeCount INT,favoriteCount INT, commentCount INT, playlist_id VARCHAR(255))")
-                cursor.execute("create table if not exists comment_det(comment_id VARCHAR(255) PRIMARY KEY, video_id VARCHAR(255),textDisplay TEXT, authorDisplayName VARCHAR(255),publishedAt VARCHAR(255))")    
+    #             cursor.execute("create table if not exists channel_det(Channel_Name TEXT,Channel_Id TEXT PRIMARY KEY,Subscription_Count INTEGER,Channel_Views INTEGER,Channel_Description TEXT,Number_of_Videos INTEGER)")
+    #             cursor.execute("create table if not exists playlist_det(playlist_id TEXT PRIMARY KEY, Channel_id TEXT,  Playlist_title TEXT, Playlist_video_count INTEGER)")
+    #             cursor.execute("create table if not exists video_det(video_id TEXT PRIMARY KEY, video_publishedAt TEXT, Channel_id TEXT, video_title TEXT, Video_description TEXT,thumbnail_url TEXT, channelTitle TEXT, duration INTEGEREGER, viewCount INTEGER, likeCount INTEGER,favoriteCount INTEGER, commentCount INTEGER, playlist_id TEXT)")
+    #             cursor.execute("create table if not exists comment_det(comment_id TEXT PRIMARY KEY, video_id TEXT,textDisplay TEXT, authorDisplayName TEXT,publishedAt TEXT)")    
 
-                for each_row in range(len(SQL_channel_details_df)):
-                    val = tuple(SQL_channel_details_df.loc[each_row])
-                    sql = "insert into channel_det values (%s,%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()
+    #             for each_row in range(len(SQL_channel_details_df)):
+    #                 val = tuple(SQL_channel_details_df.loc[each_row])
+    #                 sql = "insert into channel_det values (%s,%s,%s,%s,%s,%s)"
+    #                 cursor.execute(sql,val)
+    #                 mydb.commit()
 
 
-                for each_row in SQL_plalist_df.index:
-                    val=tuple(SQL_plalist_df.values[each_row])
-                    # st.write(val)
-                    sql = "insert into playlist_det values (%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()   
+    #             for each_row in SQL_plalist_df.index:
+    #                 val=tuple(SQL_plalist_df.values[each_row])
+    #                 # st.write(val)
+    #                 sql = "insert into playlist_det values (%s,%s,%s,%s)"
+    #                 cursor.execute(sql,val)
+    #                 mydb.commit()   
 
-                for each_row in SQL_video_df.index:
-                    val=tuple(SQL_video_df.values[each_row])
-                    sql = "insert into video_det values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()   
+    #             for each_row in SQL_video_df.index:
+    #                 val=tuple(SQL_video_df.values[each_row])
+    #                 sql = "insert into video_det values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    #                 cursor.execute(sql,val)
+    #                 mydb.commit()   
 
-                for each_row in SQL_comments_df.index:
-                    val=tuple(SQL_comments_df.values[each_row])
-                    sql = "insert into comment_det values (%s,%s,%s,%s,%s)"
-                    cursor.execute(sql,val)
-                    mydb.commit()
+    #             for each_row in SQL_comments_df.index:
+    #                 val=tuple(SQL_comments_df.values[each_row])
+    #                 sql = "insert into comment_det values (%s,%s,%s,%s,%s)"
+    #                 cursor.execute(sql,val)
+    #                 mydb.commit()
 
-                st.write(":green[Finished loading details to SQL database]")
-                st.write("navigate to next page in sidebar to proceed")
+    #             st.write(":green[Finished loading details to SQL database]")
+    #             st.write("navigate to next page in sidebar to proceed")
 
-        except Error as e:
-            st.write("Error while connecting to planet scale MySQL", e)
+    #     except Error as e:
+    #         st.write("Error while connecting to planet scale MySQL", e)
 
 
     else:
-         st.write(":red[click 'Load to SQL database' to load the filtered data]")
+         st.write(":red[click 'Load to SQLite database' to load the filtered data]")
 
 
     
