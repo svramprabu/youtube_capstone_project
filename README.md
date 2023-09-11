@@ -1,38 +1,65 @@
 # youtube_capstone_project
 
-To harvest data from youtube 
+The **youtube_capstone_project** is designed for harvesting data from YouTube, providing a structured approach for data collection, transformation, and analysis. The project is divided into three distinct sections within a Streamlit application to simplify both user and developer interaction.
 
-Divided the entire project into three pages in streamlit for the ease of access to the user as well as the developer.
-1. **Youtube_Data_Harvesting** - Pulling Data from YouTube by providing channel Ids as input and pushing it into Mongo DB Atlas. 
-2. **Creating DataFrames and Loading the SQL Database** - Now the data that is pushed to Mongo DB is pulled and transformed to form a Dataframe and then it it loaded into SQL database for further analysis.
-3. **Querying SQL Database** - Pulled data from SQL database and answered the questions raised in the project description.
+## Project Sections
 
-https://www.thepythoncode.com/article/using-youtube-api-in-python
+1. **Youtube_Data_Harvesting**:
+    - This section focuses on pulling data from YouTube by providing channel IDs as input and pushing it into a MongoDB Atlas database.
+    - Users can input the number of YouTube channels they want to assess.
+    - Input boxes are dynamically created for channel IDs based on the number input.
+    - After entering the channel IDs, users can click "Get Details" to proceed.
+    - Channel details, playlists, playlist items, and video details are extracted and saved in MongoDB.
+    - A completion message is displayed along with navigation guidance to the next section in the sidebar.
 
-**1. Youtube_Data_Harvesting (Explained)**
-    - Created a function to authorize API request. 
-    - pinged to Mongo DB atlas for a connection and printed the result of ping.
-    - getting an input of number of youtube channels that the user is planning to assess in the sidebar.
-    - as per the number input, input boxes are created to get channel ids of the respective channels to be assessed.
-    - after typing the channels ids we click get details to proceed.
-    - In the next part of the function we get channels details using the channel id provided and save it in a dictionary. Later this dictionary is access to get the required details of the channel and saved in Mongo DB.
-    - similar to the above, playlists present in the channel are retrived using the channel id and later moved from dictionary to Mongo DB.
-    - playlist ids from the playlist details are extracted and used to get playlist items details which provides details about the playlist like videos inside the playlist. this is also later saved in Mongo DB.
-    - video ids present in the playlist items details are used to retrive video details and like before is stored in Mongo DB.
-    - once all the above functions are completed with error a completion message is printed and navigation guidelike is printed requesting the user to move to next page from sidebar.
+2. **Creating DataFrames and Loading the SQL Database**:
+    - In this section, data stored in MongoDB is extracted and structured into DataFrames for further analysis.
+    - Channel details are saved as-is in a DataFrame.
+    - Playlist details and playlist item details are merged based on the playlist ID to create a consolidated DataFrame with all necessary fields.
+    - Video details are transformed, including converting the published date column to datetime.
+    - A DataFrame for comment details is created from the MongoDB data.
+    - Users are prompted to click a button to send all DataFrames to an SQL database.
+    - The SQL database connection is established, and the data from DataFrames is loaded into the database.
+    - DataFrames are displayed for reference, and users are guided to the next section.
 
-**2. Creating DataFrames and Loading the SQL Database (Explained)**
-    - In this function data stored in the Mongo DB is extracted and stored in the form of a DataFrame so that we can transform.
-    - Channel details are saved as it is in a dataframe.
-    - playlist details and playlist items details are merged on playlist id to form a new dataframe that has all the required fields.
-    - video details dataframe is transformed like published date column in converted to datetime, etc.
-    - at last comment details dataframe is created as such in Mongo DB.
-    - now the user is requested to click a button to send all the dataframes to a SQL database.
-    - the SQL database is pinged for a connection.
-    - all the datas in the dataframe are loaded in the database just how it is present in the dataframe.
-    - user is requested to navigate to next page in the sidebar while the dataframes are displayed for reference.
+3. **Querying SQL Database**:
+    - In this section, various queries mentioned in the project description are executed one by one.
+    - The query results are received as SQL tables and displayed as DataFrames.
 
-**3. Querying SQL Database (Explained)**
-    - all the queries mentioned in the project description document are answered one by one by queries created and resultant sql table is received as a dataframe and displayed below.
+For more information on using the YouTube API in Python, refer to [this guide](https://www.thepythoncode.com/article/using-youtube-api-in-python).
 
+## Usage
 
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/svramprabu/youtube_capstone_project
+   cd youtube_capstone_project
+   ```
+
+2. Install the required dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the Streamlit application:
+
+   ```bash
+   streamlit run YouTube_Data_Harvesting.py
+   ```
+
+4. Follow the guided sections within the application to harvest, process, and analyze YouTube data.
+
+## Contributors
+
+- Ramprabu S V
+<!-- - Another Contributor (if applicable) -->
+
+## License
+
+This project is a free to use/clone public repository.
+
+---
+
+Feel free to contribute to this project or report any issues on the [GitHub repository](https://github.com/svramprabu/youtube_capstone_project). Your feedback and contributions are highly appreciated and will help enhance the functionality and usability of this project.
