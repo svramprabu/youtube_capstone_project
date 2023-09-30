@@ -2,6 +2,7 @@
 
 The **youtube_capstone_project** is designed for harvesting data from YouTube, providing a structured approach for data collection, transformation, and analysis. The project is divided into three distinct sections within a Streamlit application to simplify both user and developer interaction.
 
+.
 ## Project Sections
 
 1. **Youtube_Data_Harvesting**:
